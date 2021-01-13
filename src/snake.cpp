@@ -1,8 +1,32 @@
 #include <SFML/Graphics.hpp>
 
 enum {START, IN_GAME, GAME_OVER};
+enum {VOID, SNAKE_TAIL, SNAKE_HEAD, APPLE};
 
-unsigned int start(sf::RenderWindow &window) {
+void resetMap(unsigned char (*map)[32]) {
+    for (int x = 0; x < 32; x++)
+        for (int y = 0; y < 32; y++)
+            map[x][y] = VOID;
+    map[16][16] = SNAKE_HEAD;
+}
+
+void inGame(sf::RenderWindow &window, unsigned char(*map)[32]) {
+    sf::RectangleShape rect(sf::Vector2f(16.f, 16.f));
+    rect.setFillColor(sf::Color(58, 157, 35));
+
+
+    for (int x = 0; x < 32; x++) {
+        for (int y = 0; y < 32; y++) {
+            if (map[x][y] == SNAKE_TAIL || map[x][y] == SNAKE_HEAD) {
+                rect.setPosition((float)(x * 16), (float)(y * 16));
+                window.draw(rect);
+            }
+        }
+    }
+}
+
+
+unsigned int start(sf::RenderWindow &window, unsigned char (*map)[32]) {
     sf::RectangleShape rect(sf::Vector2f(412.f, 187.f));
     sf::Font font;
     sf::Text text[2];
@@ -25,8 +49,10 @@ unsigned int start(sf::RenderWindow &window) {
     window.draw(rect);
     for(int i = 0; i < 2; i++)
         window.draw(text[i]);
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) {
+        resetMap(map);
         return IN_GAME;
+    }
     else
         return START;
 }
@@ -40,6 +66,7 @@ void setIcon(sf::RenderWindow &window) {
 int main(void) {
     sf::RenderWindow window(sf::VideoMode(512, 512), "Snake", sf::Style::Close);
     unsigned int sleep = 30, gameStep = START;
+    unsigned char map[32][32] = { 0 };
 
     setIcon(window);
     window.setVerticalSyncEnabled(true);
@@ -53,7 +80,9 @@ int main(void) {
                 window.close();
         }
         if (gameStep == START)
-            gameStep = start(window);
+            gameStep = start(window, map);
+        else if (gameStep == IN_GAME)
+            inGame(window, map);
         window.display();
     }
     return 0;
