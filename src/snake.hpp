@@ -1,6 +1,6 @@
 #ifndef SNAKE_HPP
 #define SNAKE_HPP
-#pragma once
+#pragma once 
 
 #include <SFML/Graphics.hpp>
 #include <vector>
@@ -13,13 +13,13 @@ class Snake {
 public:
 	Snake();
 	void resetSnake();
-	bool verifDead();
-	void display(sf::RenderWindow &window);
+	void display(sf::RenderWindow& window) const;
+	bool verifSnakeEatTail() const;
+	bool verifDead() const;
 	void bodyMove();
+	void moveDir(float x, float y, unsigned int direction);
 	void moveMain();
 private:
-	void moveDir(float x, float y, unsigned int direction);
-	bool verifSnakeEatTail();
 	unsigned int m_size, m_direction;
 	std::vector<sf::Vector2f> m_snakePos;
 };
