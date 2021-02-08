@@ -1,6 +1,7 @@
 #include <string>
 #include <sstream>
 #include "snake.hpp"
+#include "apple.hpp"
 
 enum {START, IN_GAME, GAME_OVER};
 
@@ -10,15 +11,17 @@ bool movePut() {
 	return false;
 }
 
-void inGame(sf::RenderWindow& window, Snake& snake, unsigned int& gameStep) {
+void inGame(sf::RenderWindow& window, Snake& snake, unsigned int& gameStep, Apple &apple, unsigned int &score) {
 	static sf::Clock clock;
 	sf::Time time = clock.getElapsedTime();
-	if (time > sf::milliseconds(66)) {
+	if (time > sf::milliseconds(99)) {
 		snake.moveMain();
 		if (snake.verifDead())
 			gameStep = GAME_OVER;
+		apple.snakeEatApple(snake, score, window);
 		clock.restart();
 	}
+	apple.draw(window);
 	snake.display(window);
 }
 
@@ -48,7 +51,7 @@ void drawRect(sf::Color c, sf::RenderWindow& window) {
 	window.draw(rect);
 }
 
-unsigned int gameOver(sf::RenderWindow& window, unsigned int& score, Snake& snake) {
+unsigned int gameOver(sf::RenderWindow& window, unsigned int& score, Snake& snake, Apple &apple) {
 	drawRect(sf::Color(150, 0, 24), window);
 	std::ostringstream oss;
 	oss << "Score : " << score << "\nPress enter to play\nPress escape to exit";
@@ -57,7 +60,9 @@ unsigned int gameOver(sf::RenderWindow& window, unsigned int& score, Snake& snak
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) {
 		snake.resetSnake();
+		apple.generation(snake);
 		score = 0;
+		window.setTitle("Snake! Score : 0");
 		return IN_GAME;
 	}
 	else
@@ -66,7 +71,7 @@ unsigned int gameOver(sf::RenderWindow& window, unsigned int& score, Snake& snak
 
 unsigned int start(sf::RenderWindow& window) {
 	drawRect(sf::Color(46, 139, 87), window);
-	drawText("Snake by Skalefou", "Pless enter to play\nPress escape to exit", window);
+	drawText("Snake! by Skalefou", "Pless enter to play\nPress escape to exit", window);
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
 		return IN_GAME;
@@ -81,9 +86,10 @@ void setIcon(sf::RenderWindow& window) {
 }
 
 int main() {
-	sf::RenderWindow window(sf::VideoMode(512, 512), "Snake", sf::Style::Close);
+	sf::RenderWindow window(sf::VideoMode(512, 512), "Snake! Score : 0", sf::Style::Close);
 	unsigned int gameStep = START, score = 0;
 	Snake snake;
+	Apple apple(snake);
 
 	setIcon(window);
 	window.setVerticalSyncEnabled(true);
@@ -99,9 +105,9 @@ int main() {
 		if (gameStep == START)
 			gameStep = start(window);
 		else if (gameStep == IN_GAME)
-			inGame(window, snake, gameStep);
+			inGame(window, snake, gameStep, apple, score);
 		else if (gameStep == GAME_OVER)
-			gameStep = gameOver(window, score, snake);
+			gameStep = gameOver(window, score, snake, apple);
 		window.display();
 	}
 	return 0;

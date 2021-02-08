@@ -19,6 +19,9 @@ public:
 	void bodyMove();
 	void moveDir(float x, float y, unsigned int direction);
 	void moveMain();
+	bool appleInSnake(float x, float y) const;
+	bool verifEatApple(float x, float y);
+	void grow();
 private:
 	unsigned int m_size, m_direction;
 	std::vector<sf::Vector2f> m_snakePos;

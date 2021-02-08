@@ -78,3 +78,24 @@ void Snake::moveMain() {
 	}
 
 }
+
+bool Snake::appleInSnake(float x, float y) const {
+	for (int i = 0; i < std::size(m_snakePos); i++)
+		if ((m_snakePos[i].x * 16) == x && (m_snakePos[i].y * 16) == y)
+			return true;
+	return false;
+}
+
+bool Snake::verifEatApple(float x, float y) {
+	if (m_snakePos[0].x == x && m_snakePos[0].y == y)
+		return true;
+	return false;
+}
+
+void Snake::grow() {
+	m_size++;
+	sf::Vector2f p;
+	p.x = -16;
+	p.y = -16;
+	m_snakePos.push_back(p);
+}
